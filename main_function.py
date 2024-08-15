@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import math
 from matplotlib.patches import Arc
 
-def circle_mapper(pointA, pointB, offset, XorY, mid=False, flip=False):
+def circle_mapper(pointA, pointB, offset, XorY, mid=False, flip=False, invert=False):
     # slope of line
     def slope(x1, y1, x2, y2):
         m = (y2 - y1)/(x2 - x1)
@@ -114,12 +114,21 @@ def circle_mapper(pointA, pointB, offset, XorY, mid=False, flip=False):
     diameter = radius * 2
     # Get angles for drawing arc
     # To make reciprocal arcs, added a simple binary check to reflect the point if (yB) > (yA)
-    if pointA[1] < pointB[1]:
-        theta1, theta2 = angler(pointA, new_point, pointB)
-        output_point = new_point
+    if not flip:    
+        if pointA[1] > pointB[1]:
+            theta1, theta2 = angler(pointA, new_point, pointB)
+            output_point = new_point
+        else:
+            theta2, theta1 = angler(pointA, reflected, pointB)
+            output_point = reflected
     else:
-        theta2, theta1 = angler(pointA, reflected, pointB)
-        output_point = reflected
+        if pointA[1] < pointB[1]:
+            theta1, theta2 = angler(pointA, new_point, pointB)
+            output_point = new_point
+        else:
+            theta2, theta1 = angler(pointA, reflected, pointB)
+            output_point = reflected
+
     # Swapping thetas depending on the relative postions of points A and B
     if XorY == "y":
         if (pointA[0] < pointB[0]) & (pointA[1] < pointB[1]):
@@ -133,7 +142,7 @@ def circle_mapper(pointA, pointB, offset, XorY, mid=False, flip=False):
             theta2, theta1 = theta1, theta2
     
     # Add the ability to flip the arcs if you fancy
-    if flip:
+    if invert:
         theta2, theta1 = theta1, theta2
 
     return output_point, diameter, theta1, theta2
